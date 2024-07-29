@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guia Turístico Maranhão</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+</head>
+<body>
+    <header>
+        <h1 class="cabecalho">Guia Turístico Maranhão</h1>
+    </header>
+    <main>
+        <section id="search">
+            <input type="text" id="searchInput" placeholder="Buscar destino...">
+        </section>
+        <section id="destinos">
+            <!-- Os destinos turísticos serão exibidos aqui -->
+        </section>
+        <section id="mapa">
+            <!-- Mapa interativo -->
+            <div id="map"></div>
+        </section>
+    </main>
+    <footer class="rodape">
+        <p>Descubra as belezas do Maranhão!</p>
+    </footer>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
