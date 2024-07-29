@@ -1,4 +1,3 @@
-
 class Atrativo {
     constructor(nome, tipo, descricao) {
         this.nome = nome;
@@ -8,7 +7,8 @@ class Atrativo {
 }
 
 class Destino {
-    constructor(nome, descricao, imagem, coordenadas, atrativos) {
+    constructor(id, nome, descricao, imagem, coordenadas, atrativos = []) {
+        this.id = id;
         this.nome = nome;
         this.descricao = descricao;
         this.imagem = imagem;
@@ -17,47 +17,49 @@ class Destino {
     }
 
     mostrarDetalhes() {
-        alert(`
-            Nome: ${this.nome}
-            Descrição: ${this.descricao}
-            Atrativos:
-            ${this.atrativos.map(atrativo => `- ${atrativo.nome} (${atrativo.tipo}): ${atrativo.descricao}`).join('\n')}
-        `);
+        const atrativosList = this.atrativos.map(atrativo => `
+            <li><strong>${atrativo.nome} (${atrativo.tipo}):</strong> ${atrativo.descricao}</li>
+        `).join('');
+
+        Swal.fire({
+            title: `<strong>${this.nome}</strong>`,
+            html: `
+                <img src="images/${this.imagem}" alt="${this.nome}" style="width: 100%; height: auto; margin-bottom: 10px;">
+                <p>${this.descricao}</p>
+                <ul>${atrativosList}</ul>
+            `,
+            showCloseButton: true,
+            focusConfirm: false,
+            confirmButtonText: 'Fechar',
+            customClass: {
+                popup: 'swal-wide'
+            }
+        });
     }
 }
 
-const destinos = [
-    new Destino(
-        "São Luís",
-        "Capital do Maranhão, conhecida por seu centro histórico.",
-        "imagens/sao-luis.jpg",
-        [-2.53073, -44.3068],
-        [
-            new Atrativo("Centro Histórico", "Monumento", "Patrimônio Mundial da UNESCO."),
-            new Atrativo("Praia de Calhau", "Praia", "Praia urbana popular.")
-        ]
-    ),
-    new Destino(
-        "Lençóis Maranhenses",
-        "Parque Nacional famoso por suas dunas e lagoas.",
-        "imagens/lencois-maranhenses.jpg",
-        [-2.60256, -43.5962],
-        [
-            new Atrativo("Lagoa Azul", "Lagoa", "Uma das mais bonitas do parque."),
-            new Atrativo("Lagoa Bonita", "Lagoa", "Famosa pela vista panorâmica.")
-        ]
-    ),
-    new Destino(
-        "Alcântara",
-        "Cidade histórica com muitos monumentos coloniais.",
-        "imagens/alcantara.jpg",
-        [-2.40553, -44.4168],
-        [
-            new Atrativo("Igreja Matriz", "Monumento", "Um dos principais pontos turísticos."),
-            new Atrativo("Praça da Matriz", "Praça", "Centro da cidade histórica.")
-        ]
-    )
-];
+let destinos = [];
+
+
+async function fetchDestinos() {
+    try {
+        const response = await fetch('/api/destinos');
+        const data = await response.json();
+        
+        for (const obj of data) {
+            const atrativosResponse = await fetch(`/api/destinos/${obj.id}/atrativos`);
+            const atrativosData = await atrativosResponse.json();
+            const atrativos = atrativosData.map(a => new Atrativo(a.nome, a.tipo, a.descricao));
+
+            const destino = new Destino(obj.id, obj.nome, obj.descricao, obj.imagem, obj.coordenadas.split(','), atrativos);
+            destinos.push(destino);
+        }
+
+        renderDestinos(destinos);
+    } catch (error) {
+        console.error('Erro ao buscar destinos:', error);
+    }
+}
 
 function renderDestinos(destinos) {
     const destinosContainer = document.getElementById('destinos');
@@ -66,7 +68,7 @@ function renderDestinos(destinos) {
         const destinoElement = document.createElement('div');
         destinoElement.classList.add('destino');
         destinoElement.innerHTML = `
-            <img src="${destino.imagem}" alt="${destino.nome}">
+            <img src="images/${destino.imagem}" alt="${destino.nome}">
             <div class="info">
                 <h3>${destino.nome}</h3>
                 <p>${destino.descricao}</p>
@@ -91,10 +93,10 @@ function mostrarDetalhes(nome) {
 }
 
 document.getElementById('searchInput').addEventListener('input', buscarDestinos);
-renderDestinos(destinos);
 
-function initMap() {
-    const map = L.map('map').setView([-2.53073, -44.3068], 7); // Coordenadas de São Luís, Maranhão
+async function initMap() {
+    await fetchDestinos();
+    const map = L.map('map').setView([-2.53073, -44.3068], 7);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenStreetMap contributors'
     }).addTo(map);
@@ -106,3 +108,9 @@ function initMap() {
 }
 
 window.onload = initMap;
+console.log(`Caminho da Imagem no Frontend: images/${this.imagem}`);
+
+
+
+
+
