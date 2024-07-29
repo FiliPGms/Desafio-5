@@ -108,7 +108,7 @@ async function initMap() {
 }
 
 window.onload = initMap;
-console.log(`Caminho da Imagem no Frontend: images/${this.imagem}`);
+
 
 
 
