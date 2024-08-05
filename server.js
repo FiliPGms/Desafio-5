@@ -1,7 +1,7 @@
 const express = require('express');
 const path = require('path');
 const pool = require('./database.js');
-const { log } = require('console');
+const { log, error } = require('console');
 
 const app = express();
 const PORT = 3000;
@@ -33,7 +33,7 @@ app.get('/api/destinos', async (req, res) => {
         res.json(rows);
     } catch (err) {
         console.error(err);
-        res.status(500).send("Erro ao recuperar destinos");
+        res.status(500).json({error: ' Erro ao recuperar destinos'});
     }
 });
 
